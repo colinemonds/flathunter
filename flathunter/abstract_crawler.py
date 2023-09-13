@@ -168,10 +168,14 @@ class Crawler(ABC):
                           max_tries=3)
     def resolve_geetest(self, driver):
         """Resolve GeeTest Captcha"""
-        data = re.findall(
-            "geetest_validate: obj.geetest_validate,\n.*?data: \"(.*)\"",
-            driver.page_source
-        )[0]
+        data = None
+        try:
+            data = re.findall(
+                "geetest_validate: obj.geetest_validate,\n.*?data: \"(.*)\"",
+                driver.page_source
+            )[0]
+        except IndexError as exc:
+            raise CaptchaUnsolvableError() from exc
         result = re.findall(
             r"initGeetest\({(.*?)}", driver.page_source, re.DOTALL)
 
